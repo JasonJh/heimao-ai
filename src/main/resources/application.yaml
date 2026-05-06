@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: heimao-ai
+  ai:
+    deepseek:
+      api-key: ${OPENAI_API_KEY}
+      base-url: ${OPENAI_BASE_URL}
+      chat:
+        options:
+          model: ${OPENAI_MODEL}
