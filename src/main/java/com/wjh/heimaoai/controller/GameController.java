@@ -11,18 +11,15 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/ai")
 @RequiredArgsConstructor
-public class ChatController {
+public class GameController {
 
-    private final ChatClient chatClient;
+    private final ChatClient gameChatClient;
 
-    private final ChatHistoryRepository chatHistoryRepository;
 
-    @RequestMapping(value = "/chat", produces = "text/html;charset=utf-8")
+    @RequestMapping(value = "/game", produces = "text/html;charset=utf-8")
     public Flux<String> chat(String prompt,String chatId){
-        //1.保存会话id
-        chatHistoryRepository.save("chat",chatId);
 
-        return chatClient.prompt()
+        return gameChatClient.prompt()
                 .user(prompt)
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .stream()
