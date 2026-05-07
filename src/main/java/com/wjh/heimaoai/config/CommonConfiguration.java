@@ -1,6 +1,7 @@
 package com.wjh.heimaoai.config;
 
 import com.wjh.heimaoai.constants.SystemConstants;
+import com.wjh.heimaoai.tools.CourseTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -43,6 +44,19 @@ public class CommonConfiguration {
                         new SimpleLoggerAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build() // 添加记忆顾问，使模型能够进行多轮对话
                 )
+                .build();
+        return build;
+    }
+
+    @Bean
+    public ChatClient serviceChatClient(DeepSeekChatModel deepSeekChatModel, ChatMemory chatMemory, CourseTools courseTools) {
+        ChatClient build = ChatClient.builder(deepSeekChatModel)
+                .defaultSystem(SystemConstants.SERVICE_SYSTEM_PROMPT)
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor(),
+                        MessageChatMemoryAdvisor.builder(chatMemory).build() // 添加记忆顾问，使模型能够进行多轮对话
+                )
+                .defaultTools(courseTools)
                 .build();
         return build;
     }
