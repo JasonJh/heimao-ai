@@ -14,9 +14,15 @@ spring:
           dimensions: ${DIMENSIONS}
     vectorstore:
       redis:
-        index-name: spring_ai_index
         initialize-schema: true
         prefix: "doc:"
+        # 定义元数据字段及其类型，Spring AI 会据此初始化 Redis Schema
+        metadata-fields:
+          - name: fileName
+            path: "$.fileName"
+            type: TAG
+        index-name: spring-ai-index
+
 
   data:
     redis:

@@ -5,12 +5,24 @@ import com.wjh.heimaoai.tools.CourseTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import redis.clients.jedis.JedisPooled;
+
+import java.util.List;
 
 @Configuration
 public class CommonConfiguration {
@@ -23,6 +35,23 @@ public class CommonConfiguration {
                 .maxMessages(100) // 根据需求设置最大保留的历史消息条数，防止Token超出限制
                 .build();
     }
+
+//    @Bean
+//    @Primary
+//    @ConditionalOnMissingBean(name = "redisVectorStore")
+//    public VectorStore redisVectorStore(OpenAiEmbeddingModel openAiEmbeddingModel, JedisPooled jedisPooled) {
+//        // 定义可过滤的元数据字段
+//        List<RedisVectorStore.MetadataField> metadataFields = List.of(
+//                RedisVectorStore.MetadataField.tag("fileName")    // TAG 类型，适合精确匹配或多值
+//        );
+//        // 使用 Redis 作为向量数据库，用于存储向量数据
+//        return RedisVectorStore.builder(jedisPooled, openAiEmbeddingModel)
+//                .initializeSchema(true)
+//                .indexName("spring_ai_index")
+//                .prefix("doc:")
+//                .metadataFields(metadataFields)
+//                .build();
+//    }
 
     @Bean
     public ChatClient chatClient(OpenAiChatModel chatModel, ChatMemory chatMemory) {
@@ -60,4 +89,23 @@ public class CommonConfiguration {
                 .build();
         return build;
     }
+
+    @Bean
+    public ChatClient pdfChatClient(OpenAiChatModel chatModel, ChatMemory chatMemory,RedisVectorStore redisVectorStore) {
+        ChatClient build = ChatClient.builder(chatModel)
+                .defaultSystem("请根据上下文回答问题，遇到上下文没有的问题，回答：不知道")
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor(),
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        QuestionAnswerAdvisor.builder(redisVectorStore)
+                                .searchRequest(SearchRequest.builder()
+                                        .similarityThreshold(0.6)
+                                        .topK(2)
+                                        .build())
+                                .build()
+                )
+                .build();
+        return build;
+    }
+
 }
