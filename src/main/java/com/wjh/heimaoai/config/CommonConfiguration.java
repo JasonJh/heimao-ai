@@ -8,7 +8,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,8 +25,8 @@ public class CommonConfiguration {
     }
 
     @Bean
-    public ChatClient chatClient(DeepSeekChatModel deepSeekChatModel, ChatMemory chatMemory) {
-        ChatClient build = ChatClient.builder(deepSeekChatModel)
+    public ChatClient chatClient(OpenAiChatModel chatModel, ChatMemory chatMemory) {
+        ChatClient build = ChatClient.builder(chatModel)
                 .defaultSystem("你是一个热心、可爱的只能助手，你的名字叫小团团，请以小团团的身份和语气回答问题")
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
@@ -37,8 +37,8 @@ public class CommonConfiguration {
     }
 
     @Bean
-    public ChatClient gameChatClient(DeepSeekChatModel deepSeekChatModel, ChatMemory chatMemory) {
-        ChatClient build = ChatClient.builder(deepSeekChatModel)
+    public ChatClient gameChatClient(OpenAiChatModel chatModel, ChatMemory chatMemory) {
+        ChatClient build = ChatClient.builder(chatModel)
                 .defaultSystem(SystemConstants.GAME_SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
@@ -49,8 +49,8 @@ public class CommonConfiguration {
     }
 
     @Bean
-    public ChatClient serviceChatClient(DeepSeekChatModel deepSeekChatModel, ChatMemory chatMemory, CourseTools courseTools) {
-        ChatClient build = ChatClient.builder(deepSeekChatModel)
+    public ChatClient serviceChatClient(OpenAiChatModel chatModel, ChatMemory chatMemory, CourseTools courseTools) {
+        ChatClient build = ChatClient.builder(chatModel)
                 .defaultSystem(SystemConstants.SERVICE_SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
