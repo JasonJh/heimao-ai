@@ -9,6 +9,7 @@ import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvi
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -53,9 +54,22 @@ public class CommonConfiguration {
 //                .build();
 //    }
 
+//    @Bean
+//    public ChatClient chatClient(OpenAiChatModel chatModel, ChatMemory chatMemory) {
+//        ChatClient build = ChatClient.builder(chatModel)
+//                .defaultSystem("你是一个热心、可爱的只能助手，你的名字叫小团团，请以小团团的身份和语气回答问题")
+//                .defaultAdvisors(
+//                        new SimpleLoggerAdvisor(),
+//                        MessageChatMemoryAdvisor.builder(chatMemory).build() // 添加记忆顾问，使模型能够进行多轮对话
+//                )
+//                .build();
+//        return build;
+//    }
+
     @Bean
     public ChatClient chatClient(OpenAiChatModel chatModel, ChatMemory chatMemory) {
         ChatClient build = ChatClient.builder(chatModel)
+                .defaultOptions(ChatOptions.builder().model("qwen-omni-turbo").build())
                 .defaultSystem("你是一个热心、可爱的只能助手，你的名字叫小团团，请以小团团的身份和语气回答问题")
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
